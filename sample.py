@@ -9,8 +9,10 @@ f.add("y", 2, 0.2)
 
 # Set formula
 f.formula = "x ** y"
-f.count_all()                   # Count all values
-f.add_to_exel()                 # Add to table
+# Count all values
+f.count_all()
+# Add to table
+f.add_to_exel()
 
 # Second row
 f.rewrite_values([2, 3])
