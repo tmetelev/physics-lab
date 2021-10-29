@@ -29,11 +29,11 @@ def container_threshold(x, linear,  c, g=1, m=100):
 class Formula:
     def __init__(self, symbol):
         self.symbol = symbol
-        self.value = {}
+        self.__value = {}
         self.__buf1 = []
-        self.thresholds = {}
+        self.__thresholds = {}
         self.__buf2 = []
-        self.symbols = []
+        self.__symbols = []
         self.__count = 0
         self.formula = ""
         self.__thresholds_formula = ""
@@ -41,15 +41,15 @@ class Formula:
 
     def add(self, symbol, value, threshold):
         self.__count += 1
-        self.symbols.append(symbol)
+        self.__symbols.append(symbol)
         self.__buf1.append(value)
-        self.value = {self.symbols[i]:  self.__buf1[i] for i in range(self.__count)}
+        self.__value = {self.__symbols[i]:  self.__buf1[i] for i in range(self.__count)}
         self.__buf2.append(threshold)
-        self.thresholds = {self.symbols[i]: self.__buf2[i] for i in range(self.__count)}
+        self.__thresholds = {self.__symbols[i]: self.__buf2[i] for i in range(self.__count)}
 
     def count(self):
         form = simplify(self.formula)
-        return form.evalf(subs=self.value)
+        return form.evalf(subs=self.__value)
 
     def get_tex(self):
         return self.symbol + " = " +  latex(simplify(self.formula))
@@ -58,11 +58,11 @@ class Formula:
         els = ""
         res = 0
         for i in range(self.__count):
-            el = diff(self.formula, self.symbols[i])
-            d = Symbol("\Delta " + self.symbols[i])
+            el = diff(self.formula, self.__symbols[i])
+            d = Symbol("\Delta " + self.__symbols[i])
             el *= d
-            ev_subs = self.value
-            ev_subs[d] = self.thresholds[self.symbols[i]]
+            ev_subs = self.__value
+            ev_subs[d] = self.__thresholds[self.__symbols[i]]
             ev_val = el.evalf(subs=ev_subs)
             s1 = Symbol("(" + latex(el) + ")")
             ev_val **= 2
