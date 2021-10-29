@@ -1,4 +1,5 @@
 from sympy import *
+import pandas as pd
 
 
 def system_threshold(c, g, m):
@@ -37,7 +38,11 @@ class Formula:
         self.__count = 0
         self.formula = ""
         self.__thresholds_formula = ""
-        self.__threshold = 0
+        self.threshold_value = 0
+        self.result_value = 0
+        self.__exel = {}
+        self.__exel[self.symbol] = []
+        self.__exel["d" + self.symbol] = []
 
     def add(self, symbol, value, threshold):
         self.__count += 1
@@ -46,15 +51,27 @@ class Formula:
         self.__value = {self.__symbols[i]:  self.__buf1[i] for i in range(self.__count)}
         self.__buf2.append(threshold)
         self.__thresholds = {self.__symbols[i]: self.__buf2[i] for i in range(self.__count)}
+        self.__exel[symbol] = []
+        self.__exel["d" + symbol] = []
 
     def count(self):
         form = simplify(self.formula)
-        return form.evalf(subs=self.__value)
+        self.result_value = form.evalf(subs=self.__value)
+
+    def rewrite_values(self, vals):
+        self.__buf1 = vals
+        self.__value = {self.__symbols[i]:  vals[i] for i in range(self.__count)}
+        self.count()
+
+    def rewrite_thresholds(self, vals):
+        self.__buf2 = vals
+        self.__thresholds = {self.__symbols[i]: vals[i] for i in range(self.__count)}
+        self.count_threshold()
 
     def get_tex(self):
-        return self.symbol + " = " +  latex(simplify(self.formula))
+        return self.symbol + " = " + latex(simplify(self.formula))
 
-    def recount_threshold(self):
+    def count_threshold(self):
         els = ""
         res = 0
         for i in range(self.__count):
@@ -64,7 +81,7 @@ class Formula:
             ev_subs = self.__value
             ev_subs[d] = self.__thresholds[self.__symbols[i]]
             ev_val = el.evalf(subs=ev_subs)
-            s1 = Symbol("(" + latex(el) + ")")
+            s1 = Symbol("" + latex(el) + "")
             ev_val **= 2
             s1 **= 2
             res += ev_val
@@ -73,19 +90,28 @@ class Formula:
             else:
                 els += s1
         els = sqrt(els)
-        self.__threshold = sqrt(res)
+        self.threshold_value = sqrt(res)
         self.__thresholds_formula = els
+
+    def count_all(self):
+        self.count()
+        self.count_threshold()
 
     def get_tex_threshold(self):
         return "\Delta " + self.symbol + " = " + latex(self.__thresholds_formula)
 
-    def threshold(self):
-        return self.__threshold
-
-    def get_all(self):
-        print("Value", self.count())
-        print("Latex", self.get_tex())
+    def print_all_tex(self):
+        print("Formula:", self.get_tex())
         print()
-        self.recount_threshold()
-        print("Threshold", self.threshold())
-        print("Latex", self.get_tex_threshold())
+        print("Threshold:", self.get_tex_threshold())
+
+    def add_to_exel(self):
+        for i in range(self.__count):
+            self.__exel[self.__symbols[i]].append(self.__buf1[i])
+            self.__exel["d" + self.__symbols[i]].append(self.__buf2[i])
+        self.__exel[self.symbol].append(self.result_value)
+        self.__exel["d" + self.symbol].append(self.threshold_value)
+
+    def write_excel(self, file_name):
+        df = pd.DataFrame(self.__exel)
+        df.to_excel('./' + file_name + '.xlsx')
