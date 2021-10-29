@@ -1,5 +1,8 @@
 from sympy import *
 import pandas as pd
+# pip install --user pandas
+# pip install --user openpyxl xlsxwriter xlrd
+# pip install --user sympy
 
 
 def system_threshold(c, g, m):
