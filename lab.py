@@ -37,6 +37,7 @@ class Formula:
         self.__count = 0
         self.formula = ""
         self.__thresholds_formula = ""
+        self.__threshold = 0
 
     def add(self, symbol, value, threshold):
         self.__count += 1
@@ -55,21 +56,36 @@ class Formula:
 
     def recount_threshold(self):
         els = ""
+        res = 0
         for i in range(self.__count):
             el = diff(self.formula, self.symbols[i])
             d = Symbol("\Delta " + self.symbols[i])
             el *= d
+            ev_subs = self.value
+            ev_subs[d] = self.thresholds[self.symbols[i]]
+            ev_val = el.evalf(subs=ev_subs)
             s1 = Symbol("(" + latex(el) + ")")
+            ev_val **= 2
             s1 **= 2
+            res += ev_val
             if i == 0:
                 els = s1
             else:
                 els += s1
         els = sqrt(els)
+        self.__threshold = sqrt(res)
         self.__thresholds_formula = els
 
     def get_tex_threshold(self):
         return "\Delta " + self.symbol + " = " + latex(self.__thresholds_formula)
 
     def threshold(self):
-        pass
+        return self.__threshold
+
+    def get_all(self):
+        print("Value", self.count())
+        print("Latex", self.get_tex())
+        print()
+        self.recount_threshold()
+        print("Threshold", self.threshold())
+        print("Latex", self.get_tex_threshold())
