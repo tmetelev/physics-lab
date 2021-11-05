@@ -84,7 +84,7 @@ class Formula:
             ev_subs = self.__value
             ev_subs[d] = self.__thresholds[self.__symbols[i]]
             ev_val = el.evalf(subs=ev_subs)
-            s1 = Symbol("" + latex(el) + "")
+            s1 = Symbol("(" + latex(el) + ")")
             ev_val **= 2
             s1 **= 2
             res += ev_val

@@ -1,31 +1,28 @@
 from lab import *
 
 # Setup
-f = Formula("F")
+f = Formula("g")
 
 # Set first row
-f.add("x", 2, 0.1)
-f.add("y", 2, 0.2)
+f.add("P", 3.14, 0.005)
+f.add("l", 0.15, 0.2)
+f.add("T", 0.75, 0.005)
 
 # Set formula
-f.formula = "x ** y"
-# Count all values
-f.count_all()
-# Add to table
-f.add_to_exel()
-
-# Second row
-f.rewrite_values([2, 3])
+f.formula = "(4 * P ** 2 * l) / (T ** 2)"
 f.count_all()
 f.add_to_exel()
 
-# Third row
-f.rewrite_values([3, 3])
-f.rewrite_thresholds([2, 2])
+f.rewrite_values([3.14, 0.2, 0.81])
 f.count_all()
 f.add_to_exel()
 
-# Out put LaTex formula
+f.rewrite_values([3.14, 0.25, 0.92])
+f.count_all()
+f.add_to_exel()
+
+f.write_excel("walues")
+print(f.result_value, f.threshold_value)
 f.print_all_tex()
-# Build Excel file
-f.write_excel("sample")
+
+# Count all values
