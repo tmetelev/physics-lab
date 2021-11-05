@@ -33,12 +33,12 @@ def container_threshold(x, linear,  c, g=1, m=100):
 class Formula:
     def __init__(self, symbol):
         self.symbol = symbol
-        self.__value = {}
-        self.__buf1 = []
-        self.__thresholds = {}
-        self.__buf2 = []
-        self.__symbols = []
-        self.__count = 0
+        self.__value = {}                   # value book
+        self.__buf1 = []                    # value list
+        self.__thresholds = {}              # thre book
+        self.__buf2 = []                    # thre list
+        self.__symbols = []                 # symbol list
+        self.__count = 0                    # num of values
         self.formula = ""
         self.__thresholds_formula = ""
         self.threshold_value = 0
@@ -57,9 +57,7 @@ class Formula:
         self.__exel[symbol] = []
         self.__exel["d" + symbol] = []
 
-    def count(self):
-        form = simplify(self.formula)
-        self.result_value = form.evalf(subs=self.__value)
+# -------------------------------------------Editing------------------------------------------------------------
 
     def rewrite_values(self, vals):
         self.__buf1 = vals
@@ -71,8 +69,11 @@ class Formula:
         self.__thresholds = {self.__symbols[i]: vals[i] for i in range(self.__count)}
         self.count_threshold()
 
-    def get_tex(self):
-        return self.symbol + " = " + latex(simplify(self.formula))
+# -----------------------------------------Counting------------------------------------------------------------
+
+    def count(self):
+        form = simplify(self.formula)
+        self.result_value = form.evalf(subs=self.__value)
 
     def count_threshold(self):
         els = ""
@@ -100,6 +101,11 @@ class Formula:
         self.count()
         self.count_threshold()
 
+# --------------------------------------------------LaTex-------------------------------------------------------------
+
+    def get_tex(self):
+        return self.symbol + " = " + latex(simplify(self.formula))
+
     def get_tex_threshold(self):
         return "\Delta " + self.symbol + " = " + latex(self.__thresholds_formula)
 
@@ -108,10 +114,12 @@ class Formula:
         print()
         print("Threshold:", self.get_tex_threshold())
 
+# -------------------------------------------------Excel-------------------------------------------------------------
+
     def add_to_exel(self):
         for i in range(self.__count):
-            self.__exel[self.__symbols[i]].append(self.__buf1[i])
-            self.__exel["d" + self.__symbols[i]].append(self.__buf2[i])
+            self.__exel[self.__symbols[i]].append(self.__value[self.__symbols[i]])
+            self.__exel["d" + self.__symbols[i]].append(self.__thresholds[self.__symbols[i]])
         self.__exel[self.symbol].append(self.result_value)
         self.__exel["d" + self.symbol].append(self.threshold_value)
 
