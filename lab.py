@@ -35,12 +35,15 @@ class Formula:
         self.symbol = symbol
         self.__value = {}                   # value book
         self.__buf1 = []                    # value list
-        self.__thresholds = {}              # thre book
-        self.__buf2 = []                    # thre list
+        self.__thresholds = {}              # thresholds book
+        self.__buf2 = []                    # thresholds list
         self.__symbols = []                 # symbol list
         self.__count = 0                    # num of values
         self.formula = ""
+        self.__latex_formula = ""
         self.__thresholds_formula = ""
+        self.__latex_formula_thresholds = ""
+        self.close_units = False            # Scobocki in threshold
         self.threshold_value = 0
         self.result_value = 0
         self.__exel = {}
@@ -69,6 +72,18 @@ class Formula:
         self.__thresholds = {self.__symbols[i]: vals[i] for i in range(self.__count)}
         self.count_threshold()
 
+    def change_symbol(self, original, new):
+        res = self.__latex_formula
+        for i in range(len(res)):
+            if res[i] == original and i != len(res) - 1:
+                res = res[:i] + new + res[i + 1:]
+        self.__latex_formula = res
+        res = self.__latex_formula_thresholds
+        for i in range(len(res)):
+            if res[i] == original and i != len(res) - 1:
+                res = res[:i] + new + res[i + 1:]
+        self.__latex_formula_thresholds = res
+
 # -----------------------------------------Counting------------------------------------------------------------
 
     def count(self):
@@ -85,7 +100,10 @@ class Formula:
             ev_subs = self.__value
             ev_subs[d] = self.__thresholds[self.__symbols[i]]
             ev_val = el.evalf(subs=ev_subs)
-            s1 = Symbol("(" + latex(el) + ")")
+            if self.close_units:
+                s1 = Symbol("(" + latex(el) + ")")
+            else:
+                s1 = Symbol(latex(el))
             ev_val **= 2
             s1 **= 2
             res += ev_val
@@ -104,15 +122,21 @@ class Formula:
 # --------------------------------------------------LaTex-------------------------------------------------------------
 
     def get_tex(self):
-        return self.symbol + " = " + latex(simplify(self.formula))
+        self.__latex_formula = self.symbol + " = " + latex(simplify(self.formula))
+        return self.__latex_formula
 
     def get_tex_threshold(self):
-        return "\Delta " + self.symbol + " = " + latex(self.__thresholds_formula)
+        self.__latex_formula_thresholds = "\Delta " + self.symbol + " = " + latex(self.__thresholds_formula)
+        return self.__latex_formula_thresholds
+
+    def generate_tex(self):
+        self.get_tex()
+        self.get_tex_threshold()
 
     def print_all_tex(self):
-        print("Formula:", self.get_tex())
+        print("Formula:", self.__latex_formula)
         print()
-        print("Threshold:", self.get_tex_threshold())
+        print("Threshold:", self.__latex_formula_thresholds)
 
 # -------------------------------------------------Excel-------------------------------------------------------------
 

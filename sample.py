@@ -1,28 +1,23 @@
 from lab import *
 
 # Setup
-f = Formula("g")
+f = Formula("\Alpha")
 
 # Set first row
-f.add("P", 3.14, 0.005)
-f.add("l", 0.15, 0.2)
-f.add("T", 0.75, 0.005)
+f.add("w", 2, 0.005)
+f.add("v", 3.14, 0.2)
+f.add("t", 4, 0.005)
+f.add("Xm", 5, 0.1)
 
 # Set formula
-f.formula = "(4 * P ** 2 * l) / (T ** 2)"
+f.formula = "Xm * sin(w * t + v)"
+f.close_units = True
 f.count_all()
 f.add_to_exel()
 
-f.rewrite_values([3.14, 0.2, 0.81])
-f.count_all()
-f.add_to_exel()
-
-f.rewrite_values([3.14, 0.25, 0.92])
-f.count_all()
-f.add_to_exel()
-
-f.write_excel("walues")
 print(f.result_value, f.threshold_value)
-f.print_all_tex()
 
-# Count all values
+f.generate_tex()
+f.change_symbol("w", "\omega")
+f.change_symbol("v", "\phi")
+f.print_all_tex()
